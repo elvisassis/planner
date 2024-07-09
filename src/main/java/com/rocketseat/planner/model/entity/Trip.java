@@ -1,6 +1,6 @@
 package com.rocketseat.planner.model.entity;
 
-import com.rocketseat.planner.model.dto.TripRequestPayload;
+import com.rocketseat.planner.dto.TripRequestPayload;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -50,6 +50,7 @@ public class Trip {
           this.startsAt = LocalDateTime.parse(data.starts_at(), DateTimeFormatter.ISO_DATE_TIME);
           this.endsAt = LocalDateTime.parse(data.ends_at(), DateTimeFormatter.ISO_DATE_TIME);
      }
+
 
 
 }

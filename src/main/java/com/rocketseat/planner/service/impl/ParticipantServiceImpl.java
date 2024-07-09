@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class ParticipantImpl implements ParticipantService {
+public class ParticipantServiceImpl implements ParticipantService {
 
     public void registerParticipantEvent(List<String> participantToInvite, UUID tripId) {}
     public void triggerConfirmationEmailToParticipants (UUID tripId) {}
