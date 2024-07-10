@@ -21,6 +21,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository participantRepository;
 
     @Override
+    public ResponseEntity<List<Participant>> getAllParticipants(UUID tripId) {
+        List<Participant> participants = this.participantRepository.findByTripId(tripId);
+        if (participants.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(participants);
+    }
+
+    @Override
     public ResponseEntity<Participant> getParticipantDetail(UUID id) {
         Optional<Participant> participant = participantRepository.findById(id);
         if (!participant.isPresent())

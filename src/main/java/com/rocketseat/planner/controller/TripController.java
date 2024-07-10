@@ -4,6 +4,7 @@ import com.rocketseat.planner.dto.ParticipantCreateResponse;
 import com.rocketseat.planner.dto.ParticipantRequestPayload;
 import com.rocketseat.planner.dto.TripCreateResponse;
 import com.rocketseat.planner.dto.TripRequestPayload;
+import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
 import com.rocketseat.planner.service.ParticipantService;
 import com.rocketseat.planner.service.TripService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -50,5 +52,10 @@ public class TripController {
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload participantRequestPayload) {
         return this.tripService.inviteParticipant(id, participantRequestPayload.email());
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<Participant>> getAllParticipants(@PathVariable UUID id) {
+        return this.participantService.getAllParticipants(id);
     }
 }

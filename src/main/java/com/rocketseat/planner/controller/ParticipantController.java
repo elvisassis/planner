@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,4 +26,5 @@ public class ParticipantController {
     public ResponseEntity<Participant> getParticipantDetail(@PathVariable UUID id) {
         return this.participantService.getParticipantDetail(id);
     }
+
 }

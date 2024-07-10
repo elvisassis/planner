@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface ParticipantService {
 
 
+    ResponseEntity<List<Participant>> getAllParticipants(UUID tripId);
     ResponseEntity<Participant> getParticipantDetail(UUID id);
     ResponseEntity<Participant> confirmParticipants(UUID id, ParticipantRequestPayload payload);
     Participant registerParticipantToEvent(String participantToInvite, Trip trip);
