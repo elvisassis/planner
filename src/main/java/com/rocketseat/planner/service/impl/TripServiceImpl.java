@@ -1,19 +1,20 @@
 package com.rocketseat.planner.service.impl;
 
+import com.rocketseat.planner.dto.ParticipantCreateResponse;
 import com.rocketseat.planner.dto.TripRequestPayload;
+import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
+import com.rocketseat.planner.repository.ParticipantRepository;
 import com.rocketseat.planner.repository.TripRepository;
 import com.rocketseat.planner.service.ParticipantService;
 import com.rocketseat.planner.service.TripService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -23,19 +24,36 @@ public class TripServiceImpl implements TripService {
 
     private final ParticipantService participantService;
 
-    public UUID save(TripRequestPayload payload) {
-        Trip newTrip = new Trip(payload);
-        this.tripRepository.save(newTrip);
-        return newTrip.getId();
+    private final ParticipantRepository participantRepository;
+
+    @Override
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(UUID id, String emailParticipant) {
+        Optional<Trip> trip = tripRepository.findById(id);
+        if (trip.isPresent()) {
+            Trip rawTrip = trip.get();
+
+            Participant participant = participantService.registerParticipantToEvent(emailParticipant, rawTrip);
+            if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(emailParticipant);
+
+            return ResponseEntity.ok(new ParticipantCreateResponse(participant.getId()));
+        }
+        return ResponseEntity.notFound().build();
     }
 
+    @Override
+    public Trip createTrip(TripRequestPayload payload) {
+        Trip newTrip = new Trip(payload);
+        return this.tripRepository.save(newTrip);
+    }
 
+    @Override
     public ResponseEntity<Trip> getTripDetails(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
         trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @Override
     public ResponseEntity<Trip> updateTrip(UUID id, TripRequestPayload payload) {
         Optional<Trip> trip = this.tripRepository.findById(id);
 
