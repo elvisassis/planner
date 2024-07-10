@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,7 +18,7 @@ public class ParticipantController {
 
     @PostMapping("/{id}/confirm")
     public ResponseEntity<Participant> confirmParticipants(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
-        return this.participantService.confirmParticipants(id, payload);
+        return this.participantService.confirmParticipant(id, payload);
     }
 
     @GetMapping("/{id}")

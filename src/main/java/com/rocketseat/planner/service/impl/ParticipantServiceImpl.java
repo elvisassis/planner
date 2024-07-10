@@ -1,5 +1,6 @@
 package com.rocketseat.planner.service.impl;
 
+import com.rocketseat.planner.dto.ParticipantData;
 import com.rocketseat.planner.dto.ParticipantRequestPayload;
 import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
@@ -21,12 +22,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository participantRepository;
 
     @Override
-    public ResponseEntity<List<Participant>> getAllParticipants(UUID tripId) {
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(UUID tripId) {
         List<Participant> participants = this.participantRepository.findByTripId(tripId);
         if (participants.isEmpty())
             return ResponseEntity.notFound().build();
 
-        return ResponseEntity.ok(participants);
+            List<ParticipantData> participantData = participants.stream().map(participant ->
+                    new ParticipantData(participant.getId(), participant.getName(), participant.getEmail(), participant.getIsConfirmed())).collect(Collectors.toUnmodifiableList());
+        return ResponseEntity.ok(participantData);
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public ResponseEntity<Participant> confirmParticipants(UUID id, ParticipantRequestPayload payload) {
+    public ResponseEntity<Participant> confirmParticipant(UUID id, ParticipantRequestPayload payload) {
         Optional<Participant> participant = this.participantRepository.findById(id);
         if (participant.isPresent()){
             Participant rawParticipant =  participant.get();
@@ -64,7 +67,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public void triggerConfirmationEmailToParticipants (UUID tripId) {}
+    public void triggerConfirmationEmailToParticipants(UUID tripId) {}
 
     @Override
     public void triggerConfirmationEmailToParticipant(String email) { }

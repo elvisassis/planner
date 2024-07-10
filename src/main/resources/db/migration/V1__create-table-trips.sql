@@ -1,5 +1,18 @@
+--Data Base H2
+--CREATE TABLE trips (
+--    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+--    destination VARCHAR(255) NOT NULL,
+--    starts_at TIMESTAMP NOT NULL,
+--    ends_at TIMESTAMP NOT NULL,
+--    is_confirmed BOOLEAN NOT NULL,
+--    owner_name VARCHAR(255) NOT NULL,
+--    owner_email VARCHAR(255) NOT NULL
+--);
+
+--Data Base Postgres
+
 CREATE TABLE trips (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     destination VARCHAR(255) NOT NULL,
     starts_at TIMESTAMP NOT NULL,
     ends_at TIMESTAMP NOT NULL,

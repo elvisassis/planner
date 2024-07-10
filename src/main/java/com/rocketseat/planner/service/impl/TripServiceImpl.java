@@ -49,7 +49,6 @@ public class TripServiceImpl implements TripService {
     @Override
     public ResponseEntity<Trip> getTripDetails(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
-        trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
