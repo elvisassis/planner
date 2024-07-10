@@ -3,6 +3,7 @@ package com.rocketseat.planner.controller;
 import com.rocketseat.planner.dto.*;
 import com.rocketseat.planner.model.entity.Trip;
 import com.rocketseat.planner.service.ActivityService;
+import com.rocketseat.planner.service.LinkService;
 import com.rocketseat.planner.service.ParticipantService;
 import com.rocketseat.planner.service.TripService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,10 @@ public class TripController {
 
     private final ActivityService activityService;
 
+    private final LinkService linkService;
+
     @PostMapping("/create")
-    public ResponseEntity<TripCreateResponse> createTrip (@RequestBody TripRequestPayload payload) {
+    public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
 
         Trip trip = this.tripService.createTrip(payload);
         this.participantService.registerParticipantToEvent(payload.emails_to_invite(), trip);
@@ -39,12 +42,12 @@ public class TripController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable UUID id, @RequestBody TripRequestPayload payload) {
+    public ResponseEntity<TripData> updateTrip(@PathVariable UUID id, @RequestBody TripRequestPayload payload) {
         return tripService.updateTrip(id, payload);
     }
 
     @GetMapping("/{id}/confirm")
-    public ResponseEntity<Trip> confirTrip(@PathVariable UUID id) {
+    public ResponseEntity<TripData> confirTrip(@PathVariable UUID id) {
         return tripService.confirmTrip(id);
     }
 
@@ -55,7 +58,8 @@ public class TripController {
 
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
-        return this.participantService.getAllParticipants(id);
+        List<ParticipantData> participantDataList = this.participantService.getAllParticipants(id);
+        return ResponseEntity.ok(participantDataList);
     }
 
     @PostMapping("/{id}/activities")
@@ -71,8 +75,24 @@ public class TripController {
     @GetMapping("/{id}/activities")
     public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id) {
         List<ActivityData> activityDataList = activityService.getActivitiesByTripId(id);
-
         return ResponseEntity.ok(activityDataList);
+    }
+
+
+    @PostMapping("/{id}/links")
+    public ResponseEntity<LinkCreateResponse> createLinks (@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
+        Optional<Trip> trip = tripService.findById(id);
+        if (trip.isPresent()) {
+            LinkCreateResponse linkCreateResponse = linkService.createLink(trip.get(), payload);
+            return ResponseEntity.status(HttpStatus.CREATED).body(linkCreateResponse);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkData>> getAllLinks (@PathVariable UUID id) {
+        List<LinkData> linkDataList = linkService.getLinksByTripId(id);
+        return ResponseEntity.ok(linkDataList);
     }
 
 }

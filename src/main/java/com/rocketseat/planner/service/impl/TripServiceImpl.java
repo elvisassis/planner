@@ -1,6 +1,7 @@
 package com.rocketseat.planner.service.impl;
 
 import com.rocketseat.planner.dto.ParticipantCreateResponse;
+import com.rocketseat.planner.dto.TripData;
 import com.rocketseat.planner.dto.TripRequestPayload;
 import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
@@ -24,14 +25,12 @@ public class TripServiceImpl implements TripService {
 
     private final ParticipantService participantService;
 
-    private final ParticipantRepository participantRepository;
 
     @Override
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(UUID id, String emailParticipant) {
         Optional<Trip> trip = tripRepository.findById(id);
         if (trip.isPresent()) {
             Trip rawTrip = trip.get();
-
             Participant participant = participantService.registerParticipantToEvent(emailParticipant, rawTrip);
             if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(emailParticipant);
 
@@ -57,29 +56,31 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public ResponseEntity<Trip> updateTrip(UUID id, TripRequestPayload payload) {
+    public ResponseEntity<TripData> updateTrip(UUID id, TripRequestPayload payload) {
         Optional<Trip> trip = this.tripRepository.findById(id);
 
         if (trip.isPresent()) {
-            Trip rowTrip = trip.get();
-            rowTrip.setDestination(payload.destination());
-            rowTrip.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
-            rowTrip.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
-            this.tripRepository.save(rowTrip);
-            return ResponseEntity.ok(rowTrip);
+            Trip rawTrip = trip.get();
+            rawTrip.setDestination(payload.destination());
+            rawTrip.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
+            rawTrip.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
+            this.tripRepository.save(rawTrip);
+            return ResponseEntity.ok(new TripData(rawTrip));
         }
         return ResponseEntity.notFound().build();
     }
 
     @Override
-    public ResponseEntity<Trip> confirmTrip(UUID id) {
+    public ResponseEntity<TripData> confirmTrip(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
+
         if (trip.isPresent()) {
             Trip rawTrip = trip.get();
             rawTrip.setIsConfirmed(true);
             this.tripRepository.save(rawTrip);
             this.participantService.triggerConfirmationEmailToParticipants(id);
-            return ResponseEntity.ok(rawTrip);
+
+            return ResponseEntity.ok(new TripData(rawTrip));
         }
 
         return ResponseEntity.notFound().build();

@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface ParticipantService {
 
 
-    ResponseEntity<List<ParticipantData>> getAllParticipants(UUID tripId);
+    List<ParticipantData>  getAllParticipants(UUID tripId);
     ResponseEntity<Participant> getParticipantDetail(UUID id);
     ResponseEntity<Participant> confirmParticipant(UUID id, ParticipantRequestPayload payload);
     Participant registerParticipantToEvent(String participantToInvite, Trip trip);

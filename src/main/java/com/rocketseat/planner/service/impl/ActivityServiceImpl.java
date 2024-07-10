@@ -11,6 +11,7 @@ import com.rocketseat.planner.service.TripService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,14 +37,12 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<ActivityData> getActivitiesByTripId(UUID tripId) {
         Optional<Trip> trip = tripService.findById(tripId);
+        List<ActivityData> activityDataList = new ArrayList<ActivityData>();
         if (trip.isPresent()) {
-            List<Activity> activities = activitiesRepository.findByTripId(tripId);
-            if (!activities.isEmpty()) {
-                List<ActivityData> activityData = activities.stream().map( activity -> new ActivityData(activity.getId(), activity.getTitle(), activity.getOccursAt())).toList();
-
-                return activityData;
-            }
+           List<Activity> activities= activitiesRepository.findByTripId(tripId);
+            if (!activities.isEmpty())
+                activityDataList = activities.stream().map( activity -> new ActivityData(activity.getId(), activity.getTitle(), activity.getOccursAt())).toList();
         }
-        return List.of();
+        return activityDataList;
     }
 }

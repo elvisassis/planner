@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,14 +23,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantRepository participantRepository;
 
     @Override
-    public ResponseEntity<List<ParticipantData>> getAllParticipants(UUID tripId) {
+    public List<ParticipantData> getAllParticipants(UUID tripId) {
         List<Participant> participants = this.participantRepository.findByTripId(tripId);
-        if (participants.isEmpty())
-            return ResponseEntity.notFound().build();
-
-            List<ParticipantData> participantData = participants.stream().map(participant ->
+        List<ParticipantData> participantDataList = new ArrayList<>();
+        if (!participants.isEmpty()) {
+            participantDataList = participants.stream().map(participant ->
                     new ParticipantData(participant.getId(), participant.getName(), participant.getEmail(), participant.getIsConfirmed())).collect(Collectors.toUnmodifiableList());
-        return ResponseEntity.ok(participantData);
+        }
+        return participantDataList;
     }
 
     @Override
