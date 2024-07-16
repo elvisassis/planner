@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Confirmação de envio</title>
+  </head>
+  <body>
+    <section style="font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;">
+      <p>Vocẽ solicitou a criaçao de uma viagem para<b th:text="${destino}">destino</b>
+        nas datas de <span style="font-weight: bold;"><b th:text="${dataInicio}">data-inicio</b> a <b th:text="${dataFim}">data-fim</b>
+            de <b th:text="${mes}">mes</b> de <b th:text="${ano}">ano</b></span>
+        </p>
+        <p>Para confirmar sua viagem, clique no link abaixo:</p>
+        <a  href="#" th:href="@{${urlConfirmarPresenca}}" target="_blank">Confirmar viagem</a>
+        <p>Caso esteja usando o dispositvo móvel, você também pode confirmar presença pelos aplicativos:</p>
+        <p>
+            <ul>
+                <li><a href="#" target="_blank">Aplicativo para Iphone</a></li>
+                <li><a href="#" target="_blank">Aplicativo para Android</a></li>
+            </ul>
+        </p>
+        <p>Caso você não saiba do que se trata esse e-mail ou não poderá estar presente, apenas
+            ignore esse email.
+        </p>
+      <div>
+      <div>
+        <img src="images/logo.png" data-th-src="|cid:logoEmail|"/>
+      </div>
+    </section>
+  </body>
+</html>

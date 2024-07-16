@@ -13,8 +13,9 @@ public interface TripService {
 
     ResponseEntity<ParticipantCreateResponse> inviteParticipant(UUID id, String emailParticipant);
     Trip createTrip(TripRequestPayload requestPayload);
-    ResponseEntity<Trip> getTripDetails(UUID id);
+    ResponseEntity<TripData> getTripDetails(UUID id);
     ResponseEntity<TripData> updateTrip(UUID id, TripRequestPayload payload);
     ResponseEntity<TripData> confirmTrip(UUID id);
     Optional<Trip> findById(UUID id);
+    void triggerConfirmationEmailToTrip(Trip trip);
 }

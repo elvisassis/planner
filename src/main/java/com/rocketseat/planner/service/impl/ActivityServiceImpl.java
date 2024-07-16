@@ -11,11 +11,17 @@ import com.rocketseat.planner.service.TripService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +43,24 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<ActivityData> getActivitiesByTripId(UUID tripId) {
         Optional<Trip> trip = tripService.findById(tripId);
-        List<ActivityData> activityDataList = new ArrayList<ActivityData>();
+        List<ActivityData> activityDataList = new ArrayList<>();
+
         if (trip.isPresent()) {
-           List<Activity> activities= activitiesRepository.findByTripId(tripId);
-            if (!activities.isEmpty())
-                activityDataList = activities.stream().map( activity -> new ActivityData(activity.getId(), activity.getTitle(), activity.getOccursAt())).toList();
+
+            List<LocalDate> tripDates = trip.get().getStartsAt().toLocalDate()
+                    .datesUntil(trip.get().getEndsAt().toLocalDate().plus(1, ChronoUnit.DAYS)).toList();
+            List<Activity> activities= activitiesRepository.findByTripId(tripId);
+
+            if (!activities.isEmpty()) {
+               tripDates.stream().forEach(tripDate -> {
+                    List<com.rocketseat.planner.dto.Activity> activityList = activities.stream()
+                            .filter(activity -> tripDate.isEqual(activity.getOccursAt().toLocalDate()))
+                            .map(activity -> new com.rocketseat.planner.dto.Activity(activity.getId(), activity.getOccursAt(), activity.getTitle()))
+                            .toList();
+                    activityDataList.add(new ActivityData(tripDate.atTime(LocalTime.now()), activityList));
+                    });
+            }
+
         }
         return activityDataList;
     }

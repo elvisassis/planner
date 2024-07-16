@@ -18,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/trips")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class TripController {
 
     private final ParticipantService participantService;
@@ -28,16 +29,16 @@ public class TripController {
 
     private final LinkService linkService;
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
 
         Trip trip = this.tripService.createTrip(payload);
-        this.participantService.registerParticipantToEvent(payload.emails_to_invite(), trip);
+        this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), trip);
         return ResponseEntity.status(HttpStatus.CREATED).body(new TripCreateResponse(trip.getId()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id) {
+    public ResponseEntity<TripData> getTripDetails(@PathVariable UUID id) {
         return tripService.getTripDetails(id);
     }
 
@@ -51,7 +52,7 @@ public class TripController {
         return tripService.confirmTrip(id);
     }
 
-    @PostMapping("/{id}/invite")
+        @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload participantRequestPayload) {
         return this.tripService.inviteParticipant(id, participantRequestPayload.email());
     }

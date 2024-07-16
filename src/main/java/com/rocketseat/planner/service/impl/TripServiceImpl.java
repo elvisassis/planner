@@ -7,8 +7,10 @@ import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
 import com.rocketseat.planner.repository.ParticipantRepository;
 import com.rocketseat.planner.repository.TripRepository;
+import com.rocketseat.planner.service.EmailService;
 import com.rocketseat.planner.service.ParticipantService;
 import com.rocketseat.planner.service.TripService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ public class TripServiceImpl implements TripService {
 
     private final ParticipantService participantService;
 
+    private final EmailService emailService;
+
 
     @Override
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(UUID id, String emailParticipant) {
@@ -32,7 +36,7 @@ public class TripServiceImpl implements TripService {
         if (trip.isPresent()) {
             Trip rawTrip = trip.get();
             Participant participant = participantService.registerParticipantToEvent(emailParticipant, rawTrip);
-            if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(emailParticipant);
+            if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(rawTrip, emailParticipant);
 
             return ResponseEntity.ok(new ParticipantCreateResponse(participant.getId()));
         }
@@ -40,15 +44,17 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
+    @Transactional
     public Trip createTrip(TripRequestPayload payload) {
         Trip newTrip = new Trip(payload);
+        triggerConfirmationEmailToTrip(newTrip);
         return this.tripRepository.save(newTrip);
     }
 
     @Override
-    public ResponseEntity<Trip> getTripDetails(UUID id) {
+    public ResponseEntity<TripData> getTripDetails(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
-        return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return trip.map(t -> ResponseEntity.ok(new TripData(t))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public Optional<Trip>findById(UUID id) {
@@ -71,6 +77,7 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<TripData> confirmTrip(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
 
@@ -78,11 +85,17 @@ public class TripServiceImpl implements TripService {
             Trip rawTrip = trip.get();
             rawTrip.setIsConfirmed(true);
             this.tripRepository.save(rawTrip);
-            this.participantService.triggerConfirmationEmailToParticipants(id);
+            List<String> listEmailParticipants = this.participantService.findByTripId(id).stream().map((Participant::getEmail)).toList();
+            this.participantService.triggerConfirmationEmailToParticipants(rawTrip, listEmailParticipants);
 
             return ResponseEntity.ok(new TripData(rawTrip));
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @Override
+    public void triggerConfirmationEmailToTrip(Trip trip) {
+        this.emailService.sendEmailConfirTrip(trip);
     }
 }

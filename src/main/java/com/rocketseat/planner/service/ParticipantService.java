@@ -16,9 +16,9 @@ public interface ParticipantService {
     ResponseEntity<Participant> getParticipantDetail(UUID id);
     ResponseEntity<Participant> confirmParticipant(UUID id, ParticipantRequestPayload payload);
     Participant registerParticipantToEvent(String participantToInvite, Trip trip);
-    void registerParticipantToEvent(List<String> participantToInvite, Trip trip);
-    void triggerConfirmationEmailToParticipants(UUID tripId);
-    void triggerConfirmationEmailToParticipant(String email);
-
+    void registerParticipantsToEvent(List<String> participantToInvite, Trip trip);
+    void triggerConfirmationEmailToParticipants(Trip trip, List<String> emails);
+    void triggerConfirmationEmailToParticipant(Trip trip, String email);
+    List<Participant> findByTripId(UUID tripID);
 
 }

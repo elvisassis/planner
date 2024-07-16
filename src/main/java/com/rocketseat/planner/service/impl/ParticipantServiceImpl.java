@@ -5,6 +5,7 @@ import com.rocketseat.planner.dto.ParticipantRequestPayload;
 import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
 import com.rocketseat.planner.repository.ParticipantRepository;
+import com.rocketseat.planner.service.EmailService;
 import com.rocketseat.planner.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class ParticipantServiceImpl implements ParticipantService {
 
     private final ParticipantRepository participantRepository;
+
+    private final EmailService emailService;
 
     @Override
     public List<ParticipantData> getAllParticipants(UUID tripId) {
@@ -61,17 +64,25 @@ public class ParticipantServiceImpl implements ParticipantService {
         return this.participantRepository.save(new Participant(emailParticipantToInvite, trip));
     }
 
-    @Override
-    public void registerParticipantToEvent(List<String> participantToInvite, Trip trip) {
-        List<Participant> participants = participantToInvite.stream().map(email -> new Participant(email, trip)).collect(Collectors.toUnmodifiableList());
+    public void registerParticipantsToEvent(List<String> participantToInvite, Trip trip) {
+        List<Participant> participants = participantToInvite.stream().map(email -> new Participant(email, trip)).toList();
         this.participantRepository.saveAll(participants);
     }
 
     @Override
-    public void triggerConfirmationEmailToParticipants(UUID tripId) {}
+    public void triggerConfirmationEmailToParticipants(Trip trip, List<String> emails) {
+        this.emailService.sendEmailConfirGuest(trip, emails);
+    }
 
     @Override
-    public void triggerConfirmationEmailToParticipant(String email) { }
+    public void triggerConfirmationEmailToParticipant(Trip trip, String email) {
+        this.emailService.sendEmailConfirGuest(trip, List.of(email));
+    }
+
+    @Override
+    public List<Participant> findByTripId(UUID tripId){
+        return this.participantRepository.findByTripId(tripId);
+    }
 }
 
 

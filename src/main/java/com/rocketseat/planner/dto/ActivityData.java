@@ -1,7 +1,9 @@
 package com.rocketseat.planner.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-public record ActivityData(UUID id, String title, LocalDateTime occurs_at) {
+public record ActivityData(LocalDateTime date, List<Activity> activities) {
 }
