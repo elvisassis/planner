@@ -1,4 +1,4 @@
-package com.rocketseat.planner.exceptionHandler;
+package com.rocketseat.planner.exception;
 
 public class StartAtCannotBeBiggerEndsAtException extends RuntimeException{
     public StartAtCannotBeBiggerEndsAtException() {

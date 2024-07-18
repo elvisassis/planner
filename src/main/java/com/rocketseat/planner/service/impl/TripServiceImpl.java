@@ -3,7 +3,7 @@ package com.rocketseat.planner.service.impl;
 import com.rocketseat.planner.dto.ParticipantCreateResponse;
 import com.rocketseat.planner.dto.TripData;
 import com.rocketseat.planner.dto.TripRequestPayload;
-import com.rocketseat.planner.exceptionHandler.StartAtCannotBeBiggerEndsAtException;
+import com.rocketseat.planner.exception.StartAtCannotBeBiggerEndsAtException;
 import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
 import com.rocketseat.planner.repository.TripRepository;
@@ -35,14 +35,11 @@ public class TripServiceImpl implements TripService {
     @Override
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(UUID id, String emailParticipant) {
         Optional<Trip> trip = tripRepository.findById(id);
-        if (trip.isPresent()) {
-            Trip rawTrip = trip.get();
-            Participant participant = participantService.registerParticipantToEvent(emailParticipant, rawTrip);
-            if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(rawTrip, emailParticipant);
-
-            return ResponseEntity.ok(new ParticipantCreateResponse(participant.getId()));
-        }
-        return ResponseEntity.notFound().build();
+        return  trip.map(t ->{
+            Participant participant = participantService.registerParticipantToEvent(emailParticipant, t);
+            if (t.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(t, emailParticipant);
+            return ResponseEntity.ok(new ParticipantCreateResponse(t.getId()));
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
@@ -69,15 +66,14 @@ public class TripServiceImpl implements TripService {
         validateTrip(payload);
         Optional<Trip> trip = this.tripRepository.findById(id);
 
-        if (trip.isPresent()) {
+       return trip.map(t -> {
             Trip rawTrip = trip.get();
             rawTrip.setDestination(payload.destination());
             rawTrip.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
             rawTrip.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
             this.tripRepository.save(rawTrip);
             return ResponseEntity.ok(new TripData(rawTrip));
-        }
-        return ResponseEntity.notFound().build();
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
@@ -85,17 +81,14 @@ public class TripServiceImpl implements TripService {
     public ResponseEntity<TripData> confirmTrip(UUID id) {
         Optional<Trip> trip = this.tripRepository.findById(id);
 
-        if (trip.isPresent()) {
+        return trip.map(t -> {
             Trip rawTrip = trip.get();
             rawTrip.setIsConfirmed(true);
             this.tripRepository.save(rawTrip);
             List<String> listEmailParticipants = this.participantService.findByTripId(id).stream().map((Participant::getEmail)).toList();
             this.participantService.triggerConfirmationEmailToParticipants(rawTrip, listEmailParticipants);
-
-            return ResponseEntity.ok(new TripData(rawTrip));
-        }
-
-        return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(new TripData(t));
+        }).orElseGet(() ->  ResponseEntity.notFound().build());
     }
 
     @Override

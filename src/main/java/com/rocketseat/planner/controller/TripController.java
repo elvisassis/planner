@@ -2,7 +2,6 @@ package com.rocketseat.planner.controller;
 
 import com.rocketseat.planner.dto.*;
 import com.rocketseat.planner.model.entity.Trip;
-import com.rocketseat.planner.model.entity.User;
 import com.rocketseat.planner.service.ActivityService;
 import com.rocketseat.planner.service.LinkService;
 import com.rocketseat.planner.service.ParticipantService;
@@ -37,11 +36,6 @@ public class TripController {
         Trip trip = this.tripService.createTrip(payload);
         this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), trip);
         return ResponseEntity.status(HttpStatus.CREATED).body(new TripCreateResponse(trip.getId()));
-    }
-
-    @GetMapping("/teste")
-    public ResponseEntity<String> teste (@RequestBody @Valid User user) {
-        return ResponseEntity.ok("passou no teste");
     }
 
     @GetMapping("/{id}")
