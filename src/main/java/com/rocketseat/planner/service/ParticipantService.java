@@ -20,5 +20,4 @@ public interface ParticipantService {
     void triggerConfirmationEmailToParticipants(Trip trip, List<String> emails);
     void triggerConfirmationEmailToParticipant(Trip trip, String email);
     List<Participant> findByTripId(UUID tripID);
-
 }

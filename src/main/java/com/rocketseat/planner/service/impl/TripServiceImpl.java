@@ -3,9 +3,9 @@ package com.rocketseat.planner.service.impl;
 import com.rocketseat.planner.dto.ParticipantCreateResponse;
 import com.rocketseat.planner.dto.TripData;
 import com.rocketseat.planner.dto.TripRequestPayload;
+import com.rocketseat.planner.exceptionHandler.StartAtCannotBeBiggerEndsAtException;
 import com.rocketseat.planner.model.entity.Participant;
 import com.rocketseat.planner.model.entity.Trip;
-import com.rocketseat.planner.repository.ParticipantRepository;
 import com.rocketseat.planner.repository.TripRepository;
 import com.rocketseat.planner.service.EmailService;
 import com.rocketseat.planner.service.ParticipantService;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +48,7 @@ public class TripServiceImpl implements TripService {
     @Override
     @Transactional
     public Trip createTrip(TripRequestPayload payload) {
+        validateTrip(payload);
         Trip newTrip = new Trip(payload);
         triggerConfirmationEmailToTrip(newTrip);
         return this.tripRepository.save(newTrip);
@@ -63,6 +66,7 @@ public class TripServiceImpl implements TripService {
 
     @Override
     public ResponseEntity<TripData> updateTrip(UUID id, TripRequestPayload payload) {
+        validateTrip(payload);
         Optional<Trip> trip = this.tripRepository.findById(id);
 
         if (trip.isPresent()) {
@@ -97,5 +101,11 @@ public class TripServiceImpl implements TripService {
     @Override
     public void triggerConfirmationEmailToTrip(Trip trip) {
         this.emailService.sendEmailConfirTrip(trip);
+    }
+
+    private void validateTrip(TripRequestPayload payload) {
+        if(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME).isAfter(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME))) {
+            throw new StartAtCannotBeBiggerEndsAtException();
+        }
     }
 }

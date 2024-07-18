@@ -66,6 +66,7 @@ public class EmailServiceImpl implements EmailService {
            CompletableFuture.runAsync(() -> {
                 try {
                     this.sendEmail(variables, TEMPLATE_NAME_CONFIRM_GUESTS, LOGO_EMAIL, email);
+                    System.out.println("Thread: " + Thread.currentThread().getName());
                 } catch (MessagingException e) {
                     throw new RuntimeException(e);
                 }
@@ -120,7 +121,7 @@ public class EmailServiceImpl implements EmailService {
 
         messageHelper.addInline("logoEmail", clr, PNG_MIME);
 
-        mailSender.send(mimeMessage);
+        //mailSender.send(mimeMessage);
     }
 
 }

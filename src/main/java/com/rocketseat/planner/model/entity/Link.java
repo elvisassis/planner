@@ -3,6 +3,7 @@ package com.rocketseat.planner.model.entity;
 import com.rocketseat.planner.dto.ActivityRequestPayload;
 import com.rocketseat.planner.dto.LinkRequestPayload;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,12 +27,15 @@ public class Link {
     private UUID id;
 
     @Column(name = "title", nullable = false)
+    @NotNull
     private String title;
 
     @Column(name = "url", nullable = false)
+    @NotNull
     private String url;
 
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 

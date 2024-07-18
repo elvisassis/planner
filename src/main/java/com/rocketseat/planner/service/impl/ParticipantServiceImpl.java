@@ -39,10 +39,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public ResponseEntity<Participant> getParticipantDetail(UUID id) {
         Optional<Participant> participant = participantRepository.findById(id);
-        if (!participant.isPresent())
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(participant.get());
+        return participant.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override

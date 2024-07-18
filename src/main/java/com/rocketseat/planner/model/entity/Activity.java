@@ -2,6 +2,7 @@ package com.rocketseat.planner.model.entity;
 
 import com.rocketseat.planner.dto.ActivityRequestPayload;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,12 +26,15 @@ public class Activity {
     private UUID id;
 
     @Column(name = "occurs_at", nullable = false)
+    @NotNull
     private LocalDateTime occursAt;
 
     @Column(name = "titulo", nullable = false)
+    @NotNull
     private String title;
 
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 

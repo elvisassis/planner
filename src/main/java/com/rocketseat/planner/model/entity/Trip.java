@@ -2,6 +2,8 @@ package com.rocketseat.planner.model.entity;
 
 import com.rocketseat.planner.dto.TripRequestPayload;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,21 +27,27 @@ public class Trip {
      private UUID id;
 
      @Column(name = "destination", nullable = false)
+     @NotNull
      private String destination;
 
      @Column(name = "starts_at", nullable = false)
+     @NotNull
      private LocalDateTime startsAt;
 
      @Column(name = "ends_at", nullable = false)
+     @NotNull
      private LocalDateTime endsAt;
 
      @Column(name = "is_confirmed", nullable = false)
+     @NotNull
      private Boolean isConfirmed;
 
      @Column(name = "owner_name", nullable = false)
+     @NotNull
      private String ownerName;
 
-     @Column(name = "owner_email", nullable = false)
+     @Column(name = "owner_email")
+     @NotNull
      private String ownerEmail;
 
      public Trip(TripRequestPayload data) {

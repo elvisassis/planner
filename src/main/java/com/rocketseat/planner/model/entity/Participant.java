@@ -1,6 +1,7 @@
 package com.rocketseat.planner.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,15 +24,19 @@ public class Participant {
     private UUID id;
 
     @Column(name = "name", nullable = false)
+    @NotNull
     private String name;
 
     @Column(name = "email", nullable = false)
+    @NotNull
     private String email;
 
     @Column(name = "is_confirmed", nullable = false)
+    @NotNull
     private Boolean isConfirmed;
 
     @ManyToOne
+    @NotNull
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 
